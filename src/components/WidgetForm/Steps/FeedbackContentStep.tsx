@@ -7,6 +7,7 @@ import { CloseButton } from "../../CloseButton";
 import { ScreenshotButton } from "../ScreenshotButton";
 
 import { FeedbackType, feedbackTypes } from "..";
+import { api } from "../../../lib/api";
 
 type IProps = {
   feedbackType: FeedbackType;
@@ -21,20 +22,19 @@ export function FeedbackContentStep(props: IProps): JSX.Element {
 
   const feedbackTypeInfo = feedbackTypes[props.feedbackType];
 
-  function handleSubmitFeedback(event: FormEvent): void {
+  async function handleSubmitFeedback(event: FormEvent): Promise<void> {
     event.preventDefault();
 
     setIsFormSubmitting(() => true);
-
-    setTimeout(() => {
-      console.log({
-        screenshot,
-        comment,
-      });
-
-      setIsFormSubmitting(() => false);
-      props.onFeedbackSent();
-    }, 1000);
+  
+    await api.post('/feedbacks', {
+      type: props.feedbackType,
+      comment,
+      screenshot
+    })
+    
+    setIsFormSubmitting(() => false);
+    props.onFeedbackSent();
   }
 
   return (
